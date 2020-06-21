@@ -1,29 +1,82 @@
 <template>
-  <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js + TypeScript App"/>
-  </div>
+  <v-app relative>
+    <v-main>
+      <router-view />
+    </v-main>
+    <v-btn
+      class="main-floating"
+      color="primary"
+      fab
+      dark
+      fixed
+      right
+      bottom
+      @click="togglePlaceModal"
+    >
+      <v-icon>mdi-plus</v-icon>
+    </v-btn>
+    <v-bottom-navigation
+      dark
+      fixed
+      app
+      shift
+    >
+      <v-btn
+        v-for="(item, i) in navigation"
+        :key="`navigation_${i}`"
+        :to="item.link"
+      >
+        <span>{{ item.title }}</span>
+        <v-icon>{{ item.icon }}</v-icon>
+      </v-btn>
+    </v-bottom-navigation>
+    <PlaceModal
+      :modal-is-show="placeModalIsShow"
+      @close="togglePlaceModal"
+    />
+  </v-app>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import HelloWorld from './components/HelloWorld.vue';
-
+import { Navigation } from '@/typings/interfaces/navigation';
+import PlaceModal from '@/components/PlaceModal.vue';
 @Component({
+  name: 'App',
   components: {
-    HelloWorld,
-  },
+    PlaceModal
+  }
 })
-export default class App extends Vue {}
-</script>
 
-<style lang="scss">
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+export default class App extends Vue {
+  private navigation: Navigation[] = [
+    {
+      link: '/',
+      title: 'Map',
+      icon: 'mdi-map'
+    },
+    {
+      link: '/places',
+      title: 'Places',
+      icon: 'mdi-home'
+    },
+    {
+      link: '/about',
+      title: 'About',
+      icon: 'mdi-information-outline'
+    }
+  ];
+
+  private placeModalIsShow: boolean = false;
+
+  togglePlaceModal():void {
+    this.placeModalIsShow = !this.placeModalIsShow;
+  }
+
 }
+</script>
+<style lang="scss">
+  .v-btn.main-floating{
+    bottom: 75px !important;
+  }
 </style>
