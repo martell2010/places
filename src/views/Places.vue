@@ -57,11 +57,15 @@
 </template>
 <script lang="ts">
 import { Component, Vue }  from 'vue-property-decorator';
-
-@Component
+import { db } from '@/db'
+@Component({
+  firestore: {
+    places: db.collection('places'),
+  }
+})
 export default class Places extends Vue {
   private loading:boolean = true;
-
+  private  places: [] = [];
   showLoading():void {
     this.loading = true;
     setTimeout(():void => {
