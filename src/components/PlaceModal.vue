@@ -5,40 +5,144 @@
     @click:outside="close"
   >
     <v-card>
-      <v-card-title
-        class="headline primary"
-        primary-title
+      <ValidationObserver
+        ref="formObserver"
+        tag="form"
+        @submit.prevent="addPlace"
       >
-        Add new place
-      </v-card-title>
-
-      <v-card-text>
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-      </v-card-text>
-
-      <v-divider />
-
-      <v-card-actions>
-        <v-spacer />
-        <v-btn
-          color="primary"
-          text
-          @click="close"
+        <v-card-title
+          class="headline primary"
+          primary-title
         >
-          I accept
-        </v-btn>
-      </v-card-actions>
+          Add new place
+        </v-card-title>
+        <v-card-text>
+          <ValidationProvider
+            v-slot="{ errors }"
+            rules=""
+            :name="' '"
+            vid="image"
+          > 
+            <v-file-input
+              v-model="form.image"
+              show-size
+              label="Image"
+              :error-messages="errors"
+              prepend-icon="mdi-camera"
+              accept="image/*"
+            />
+          </ValidationProvider>
+          <ValidationProvider
+            v-slot="{ errors }"
+            rules="required|min:3"
+            :name="' '"
+            vid="name"
+          > 
+            <v-text-field
+              v-model="form.name"
+              label="Name"
+              :error-messages="errors"
+            />
+          </ValidationProvider>
+          <ValidationProvider
+            v-slot="{ errors }"
+            rules="required"
+            :name="' '"
+            vid="description"
+          > 
+            <v-text-field
+              v-model="form.description"
+              label="Description"
+              :error-messages="errors"
+            />
+          </ValidationProvider>
+          <ValidationProvider
+            v-slot="{ errors }"
+            rules="url"
+            :name="' '"
+            vid="url"
+          > 
+            <v-text-field
+              v-model="form.url"
+              label="Website"
+              :error-messages="errors"
+            />
+          </ValidationProvider>
+       
+          Rating
+          <v-rating
+            v-model="form.rating"
+            background-color="orange lighten-3"
+            color="orange"
+          />
+        </v-card-text>
+
+        <v-divider />
+
+        <v-card-actions>
+          <v-spacer />
+          <v-btn
+            color="grey"
+            text
+            @click="close"
+          >
+            Close
+          </v-btn>
+          <v-btn
+            color="primary"
+            text
+            :loading="loading"
+            type="submit"
+          >
+            Submit
+          </v-btn>
+        </v-card-actions>
+      </ValidationObserver>
     </v-card>
   </v-dialog>
 </template>
 <script lang="ts">
 import { Component, Vue, Prop, Emit } from 'vue-property-decorator';
-
+import { Place } from '@/typings/interfaces/place';
+import { db, GeoPoint} from '@/db';
+import firebase from 'firebase/app'
+import { uploadFile } from '@/utils/uploadFile';
 @Component
 export default class PlaceModal extends Vue {
   @Prop({ default: false }) readonly modalIsShow!: boolean
+  private loading:boolean = false;
+  private form:Place = {
+    image: '',
+    name: '',
+    description: '',
+    url: '',
+    rating: 5,
+  };
 
   @Emit()
   close():void{}
+
+
+  async addPlace():Promise<boolean|void>{
+    const valid = await this.$refs.formObserver.validate();
+    console.log(valid);
+    if (!valid) return false;
+    try {
+      this.loading = true;
+      const imageUrl = await uploadFile(this.form.image);
+      const sendData:Place = {
+        ...this.form,
+        image: imageUrl,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        location: new GeoPoint(48.8588377, 2.2770206)
+      }
+      const data = await db.collection('places').add(sendData);
+      console.log('data', data);
+    } catch (error) {
+      console.log('error', { error })
+    }finally{
+      this.loading = false
+    }
+  }
 }
 </script>

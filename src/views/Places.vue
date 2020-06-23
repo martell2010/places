@@ -1,41 +1,55 @@
 <template>
   <div class="pb-5">
-    <v-row>
+    <v-row v-if="!places.length">
       <v-col
-        v-for="(item, i) in 12"
+        v-for="(item, i) in 6"
         :key="i"
         cols="12"
         md="4"
       >
         <v-skeleton-loader
-          v-show="loading"
           class="mx-auto"
           type="card"
         />
+      </v-col>
+    </v-row>
+    <v-row v-else>
+      <v-col
+        v-for="(item, i) in places"
+        :key="i"
+        cols="12"
+        md="4"
+      >
         <v-card
-          v-show="!loading"
+          
           class="mx-auto"
         >
           <v-img
-            src="https://cdn.vuetifyjs.com/images/cards/mountain.jpg"
+            :src="item.image || 'https://cdn.vuetifyjs.com/images/cards/mountain.jpg'"
             height="194"
           />
           <v-card-text>
-            Visit ten places on our planet that are undergoing the biggest changes today.
+            {{ item.name }}
           </v-card-text>
-
+          <v-rating
+            v-model="item.rating"
+            readonly
+            small
+            background-color="orange lighten-3"
+            color="orange"
+          />
           <v-card-actions>
             <v-btn
               text
               color="deep-purple accent-4"
             >
-              Read
+              More
             </v-btn>
             <v-btn
               text
               color="deep-purple accent-4"
             >
-              Bookmark
+              To map
             </v-btn>
             <v-spacer />
             <v-btn icon>
@@ -57,7 +71,9 @@
 </template>
 <script lang="ts">
 import { Component, Vue }  from 'vue-property-decorator';
-import { db } from '@/db'
+import { Place } from '@/typings/interfaces/place';
+import { db } from '@/db';
+
 @Component({
   firestore: {
     places: db.collection('places'),
@@ -65,16 +81,6 @@ import { db } from '@/db'
 })
 export default class Places extends Vue {
   private loading:boolean = true;
-  private  places: [] = [];
-  showLoading():void {
-    this.loading = true;
-    setTimeout(():void => {
-      this.loading = false;
-    }, 5000)
-  }
-  mounted():void {
-    this.showLoading();
-  }
-
+  private  places: Place[] = [];
 }
 </script>

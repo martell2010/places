@@ -1,9 +1,6 @@
-import Vue from 'vue';
 import firebase from 'firebase/app'
 import 'firebase/firestore'
-
-// import { firestorePlugin } from 'vuefire'
-// Vue.use(firestorePlugin)
+import 'firebase/storage'
 
 firebase.initializeApp({
   apiKey: 'AIzaSyBeFCpVT8fSA25tq53nepyZJTu68GEP_Gw',
@@ -16,4 +13,8 @@ firebase.initializeApp({
   measurementId: 'G-RBK9QXLR7B'
 });
 
+const { Timestamp, GeoPoint } = firebase.firestore;
+export { Timestamp, GeoPoint };
+
+export const storage = firebase.storage();
 export const db = firebase.firestore()
