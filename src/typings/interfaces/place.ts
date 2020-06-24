@@ -1,16 +1,12 @@
-import { Location } from './location';
-
+import { GeoPoint, FieldValue } from '@firebase/firestore-types';
 interface Place {
   url: string;
   description: string;
   image: File | string;
   name: string;
   rating: number;
-  createAt?: {
-    nanoseconds: number;
-    seconds: number;
-  };
-  location?: Location
+  createdAt?: FieldValue;
+  location?: GeoPoint;
 }
 
 export { Place };

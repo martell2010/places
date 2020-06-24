@@ -107,10 +107,12 @@ import { Place } from '@/typings/interfaces/place';
 import { db, GeoPoint} from '@/db';
 import firebase from 'firebase/app'
 import { uploadFile } from '@/utils/uploadFile';
+import { ValidationObserver } from 'vee-validate/dist/types';
 @Component
 export default class PlaceModal extends Vue {
   @Prop({ default: false }) readonly modalIsShow!: boolean
   private loading:boolean = false;
+  private observer:any = null;
   private form:Place = {
     image: '',
     name: '',
@@ -122,9 +124,8 @@ export default class PlaceModal extends Vue {
   @Emit()
   close():void{}
 
-
   async addPlace():Promise<boolean|void>{
-    const valid = await this.$refs.formObserver.validate();
+    const valid = await this.observer.validate();
     console.log(valid);
     if (!valid) return false;
     try {
@@ -136,13 +137,29 @@ export default class PlaceModal extends Vue {
         createdAt: firebase.firestore.FieldValue.serverTimestamp(),
         location: new GeoPoint(48.8588377, 2.2770206)
       }
-      const data = await db.collection('places').add(sendData);
-      console.log('data', data);
+      await db.collection('places').add(sendData);
+      this.close();
+      this.resetForm();
     } catch (error) {
       console.log('error', { error })
     }finally{
       this.loading = false
     }
   }
+
+  resetForm():void {
+    this.form = {
+      image: '',
+      name: '',
+      description: '',
+      url: '',
+      rating: 5,
+    },
+    this.observer.reset();
+  }
+  mounted() {
+    this.observer = this.$refs.formObserver as InstanceType<typeof ValidationObserver>;
+  }
+
 }
 </script>
