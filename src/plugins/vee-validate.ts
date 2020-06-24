@@ -1,13 +1,13 @@
 
 import Vue from 'vue';
-import { localize } from 'vee-validate';
+// import { localize } from 'vee-validate';
 import { ValidationProvider, ValidationObserver } from 'vee-validate';
-import ru from 'vee-validate/dist/locale/ru.json';
+// import ru from 'vee-validate/dist/locale/ru.json';
 import { extend } from 'vee-validate';
-import { required, email, confirmed, min, max, integer, is, regex } from 'vee-validate/dist/rules';
-const rules:any = { required, email, confirmed, min, max, integer, is, regex };
+import { required, email, confirmed, min, max, integer, is, regex, image } from 'vee-validate/dist/rules';
+const rules:any = { required, email, confirmed, min, max, integer, is, regex, image };
 
-localize({ ru }); // added locals for plugin
+// localize({ ru }); // added locals for plugin
 
 Object.keys(rules).forEach(rule => {
   extend(rule, rules[rule]);
@@ -22,10 +22,11 @@ extend('url', {
             '(\\#[-a-z\\d_]*)?$', 'i'); // fragment locator
     return !!pattern.test(str);
   },
-  message: 'Не валидный url адрес'
+  message: 'Not correct url'
 })
 
-localize('ru'); // set default local
+// localize('ru'); // set default local
+
 
 Vue.component('ValidationObserver', ValidationObserver);
 Vue.component('ValidationProvider', ValidationProvider);
