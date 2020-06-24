@@ -1,20 +1,19 @@
-import firebase from 'firebase/app'
-import 'firebase/firestore'
-import 'firebase/storage'
-
+import firebase from 'firebase/app';
+import 'firebase/firestore';
+import 'firebase/storage';
 firebase.initializeApp({
-  apiKey: 'AIzaSyBeFCpVT8fSA25tq53nepyZJTu68GEP_Gw',
-  authDomain: 'martell-places.firebaseapp.com',
-  databaseURL: 'https://martell-places.firebaseio.com',
-  projectId: 'martell-places',
-  storageBucket: 'martell-places.appspot.com',
-  messagingSenderId: '127326388022',
-  appId: '1:127326388022:web:effd86eaa509a2ef9efd97',
-  measurementId: 'G-RBK9QXLR7B'
+  apiKey: process.env.VUE_APP_FIREBASE_API_KEY,
+  authDomain: process.env.VUE_APP_FIREBASE_AUTH_DOMAIN,
+  databaseURL: process.env.VUE_APP_FIREBASE_DB_URL,
+  projectId: process.env.VUE_APP_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.VUE_APP_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.VUE_APP_FIREBASE_SENDER_ID,
+  appId: process.env.VUE_APP_FIREBASE_APP_ID,
+  measurementId: process.env.VUE_APP_FIREBASE_MEASUREMENT_ID,
 });
 
 const { Timestamp, GeoPoint } = firebase.firestore;
-export { Timestamp, GeoPoint };
+const storage = firebase.storage();
+const db = firebase.firestore();
 
-export const storage = firebase.storage();
-export const db = firebase.firestore()
+export { Timestamp, GeoPoint, db, storage };
