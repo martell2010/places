@@ -1,0 +1,3 @@
+const MAP_CENTER_DEFAULT: number[] = [50.436338, 30.621992];
+
+export { MAP_CENTER_DEFAULT };

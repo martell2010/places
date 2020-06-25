@@ -3,7 +3,12 @@ import App from './App.vue';
 import router from './router';
 import store from './store';
 import vuetify from './plugins/vuetify';
+import './plugins/vee-validate';
 import 'leaflet/dist/leaflet.css';
+// import './db';
+import { firestorePlugin } from 'vuefire';
+
+Vue.use(firestorePlugin);
 
 Vue.config.productionTip = false;
 
