@@ -75,6 +75,13 @@
             background-color="orange lighten-3"
             color="orange"
           />
+          <div class="place-modal__map">
+            <BaseMap
+              ref="baseMap"
+              :center="center"
+              @map-click="changeMarkerPosition"
+            />
+          </div>
         </v-card-text>
 
         <v-divider />
@@ -102,20 +109,29 @@
   </v-dialog>
 </template>
 <script lang="ts">
-import { Component, Vue, Prop, Emit } from 'vue-property-decorator';
+import { Component, Vue, Prop, Emit, Watch } from 'vue-property-decorator';
 import { Place } from '@/typings/interfaces/place';
 import { db, GeoPoint} from '@/db';
 import firebase from 'firebase/app';
 import { uploadFile } from '@/utils/uploadFile';
 import { VeeValidateObserverRef } from '@/typings/interfaces/veeValidate';
+import { LeafletMouseEvent } from 'leaflet'
+import BaseMap from '@/components/common/BaseMap.vue';
+import { MAP_CENTER_DEFAULT } from '@/utils/constants';
 
-@Component
+@Component({
+  components: {
+    BaseMap
+  }
+})
 export default class PlaceModal extends Vue {
   @Prop({ default: false }) readonly modalIsShow!: boolean
   private loading:boolean = false;
   $refs!: {
-    formObserver: VeeValidateObserverRef
+    formObserver: VeeValidateObserverRef,
+    baseMap: any
   }
+  private center: number[] = MAP_CENTER_DEFAULT;
   private form:Place = {
     image: null,
     name: '',
@@ -123,22 +139,30 @@ export default class PlaceModal extends Vue {
     url: '',
     rating: 5,
   };
+  @Watch('modalIsShow')
+  onShowChange(open:boolean):void|boolean {
+    if(!open) return false;
+    this.$nextTick(():void => {
+      const map: any = this.$refs.baseMap.mapInstance();
+      map.mapObject._onResize(); 
+    })
+  }
 
   @Emit()
   close():void{}
 
   async addPlace():Promise<boolean|void>{
     const valid = await this.$refs.formObserver.validate();
-    console.log(valid);
     if (!valid) return false;
     try {
       this.loading = true;
       const imageUrl = await uploadFile(this.form.image);
+      const [lat, lng] = this.center;
       const sendData:Place = {
         ...this.form,
         image: imageUrl,
         createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-        location: new GeoPoint(48.8588377, 2.2770206)
+        location: new GeoPoint(lat, lng)
       }
       await db.collection('places').add(sendData);
       this.close();
@@ -150,6 +174,10 @@ export default class PlaceModal extends Vue {
     }
   }
 
+  changeMarkerPosition(e:LeafletMouseEvent):void{
+    this.center = Object.values(e.latlng);
+  }
+
   resetForm():void {
     this.form = {
       image: null,
@@ -158,7 +186,15 @@ export default class PlaceModal extends Vue {
       url: '',
       rating: 5,
     },
+    this.center = MAP_CENTER_DEFAULT;
     this.$refs.formObserver.reset();
   }
+  
 }
 </script>
+<style>
+  .place-modal__map{
+    height: 250px;
+    margin-top: 10px;
+  }
+</style>
