@@ -1,7 +1,9 @@
 <template>
   <v-app relative>
     <v-main>
-      <router-view />
+      <keep-alive :max="5">
+        <router-view />
+      </keep-alive>
     </v-main>
     <v-btn
       class="main-floating"
@@ -41,6 +43,7 @@
 import { Component, Vue } from 'vue-property-decorator';
 import { Navigation } from '@/typings/interfaces/navigation';
 import PlaceModal from '@/components/PlaceModal.vue';
+import { Action } from 'vuex-class';
 @Component({
   name: 'App',
   components: {
@@ -66,6 +69,12 @@ export default class App extends Vue {
       icon: 'mdi-information-outline'
     }
   ];
+  @Action('bindPlaces', {  })
+  bindPlaces: any;
+
+  created () {
+    this.bindPlaces();
+  }
 
   private placeModalIsShow: boolean = false;
 
