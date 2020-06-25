@@ -1,12 +1,19 @@
 <template>
   <l-map
     ref="map"
+    class="map"
     :center="center"
     :zoom="zoom"
     @click="mapClick"
+    @ready="onReady"
+    v-on="$attrs"
   >
-    <slot name="markers">
+    <slot
+      name="marker"
+      :icon="icon"
+    >
       <LMarker
+        v-if="showDefaultMaker"
         :lat-lng="center"
         :icon="icon"
       />
@@ -19,19 +26,21 @@
 <script lang="ts">
 import { Component, Vue, Prop, Emit} from 'vue-property-decorator';
 import L from 'leaflet';
-import { LMap, LTileLayer, LMarker } from 'vue2-leaflet';
+import { LMap, LTileLayer, LMarker, LLayerGroup } from 'vue2-leaflet';
 import { LeafletMouseEvent } from 'leaflet'
 
 @Component({
   components: {
     LMap,
     LTileLayer,
-    LMarker
+    LMarker,
+    LLayerGroup
   }
 })
 export default class Map extends Vue {
   @Prop({required:true}) readonly center!: number[]
   @Prop({default:15}) readonly zoom!: number
+  @Prop({default:true}) readonly showDefaultMaker!: boolean
   @Prop({default:'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'}) readonly layerUrl!: string
   @Prop({default: ()=> L.icon({
     iconUrl: 'https://image.flaticon.com/icons/svg/1673/1673188.svg',
@@ -41,7 +50,13 @@ export default class Map extends Vue {
   @Emit()
   mapClick(event:LeafletMouseEvent):LeafletMouseEvent {
     return event;
+  } 
+
+  @Emit()
+  onReady(event:any):any { //TODO: find correct type
+    return event;
   }
+  
   mapInstance():object{
     return this.$refs.map;
   }
@@ -49,7 +64,16 @@ export default class Map extends Vue {
 
 </script>
 <style lang="scss">
-  .vue2leaflet-map{
-    z-index: 1;
+.vue2leaflet-map{
+  z-index: 1;
+}
+.map{
+  .leaflet-popup-content{
+    margin: 0;
   }
+  .leaflet-popup-content-wrapper, .leaflet-popup-tip{
+    background: #1e1e1e;
+    padding: 0;
+  }
+}
 </style>

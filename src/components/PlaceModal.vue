@@ -143,7 +143,7 @@ export default class PlaceModal extends Vue {
   onShowChange(open:boolean):void|boolean {
     if(!open) return false;
     this.$nextTick(():void => {
-      const map: any = this.$refs.baseMap.mapInstance();
+      const map: any = this.$refs.baseMap.mapInstance();  //TODO: find correct type
       map.mapObject._onResize(); 
     })
   }
