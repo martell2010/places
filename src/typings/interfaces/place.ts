@@ -6,7 +6,7 @@ interface Place {
   name: string;
   rating: number;
   createdAt?: FieldValue;
-  location?: GeoPoint;
+  location?: GeoPoint | object;
 }
 
 export { Place };
